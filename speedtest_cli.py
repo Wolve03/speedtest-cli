@@ -30,6 +30,9 @@ import re
 import signal
 import socket
 
+# Used for adding a random number at the end of GET and POST requests, to save from caching
+import random
+
 # Used for bound_interface
 socket_socket = socket.socket
 
@@ -224,7 +227,7 @@ class FilePutter(threading.Thread):
     """Thread class for putting a URL"""
 
     def __init__(self, url, start, size):
-        self.url = url
+        self.url = url + "?x=" + str(random.random())  # Random variable after the URL against caching
         chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         data = chars * (int(round(int(size) / 36.0)))
         self.data = ('content1=%s' % data[0:int(size) - 9]).encode()
@@ -577,8 +580,8 @@ def speedtest():
     urls = []
     for size in sizes:
         for i in range(0, 4):
-            urls.append('%s/random%sx%s.jpg' %
-                        (os.path.dirname(best['url']), size, size))
+            urls.append('%s/random%sx%s.jpg?x=%s' %
+                        (os.path.dirname(best['url']), size, size, str(random.random() )) # Random value against caching
     if not args.simple:
         print_('Testing download speed', end='')
     dlspeed = downloadSpeed(urls, args.simple)
